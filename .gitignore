@@ -1,0 +1,17 @@
+.env
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+dist/
+build/
+.ruff_cache/
+.pytest_cache/
+.mypy_cache/
+*.log
+.cache/
+corpus/*.jsonl
+rag_tool/documents/*
+!rag_tool/documents/.gitkeep
+rag_tool/data/*
+!rag_tool/data/.gitkeep

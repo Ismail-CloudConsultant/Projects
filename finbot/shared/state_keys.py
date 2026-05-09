@@ -1,0 +1,8 @@
+TICKER = "ticker"
+COMPANY_NAME = "company_name"
+STOCK_METRICS = "stock_metrics"
+COMPOSITE_SCORE = "composite_score"
+SCORE_BREAKDOWN = "score_breakdown"
+PORTFOLIO_HOLDINGS = "portfolio_holdings"
+LAST_EXPLAINED_METRIC = "last_explained_metric"
+NEWS_SENTIMENT = "news_sentiment"

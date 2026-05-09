@@ -1,0 +1,63 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build'
+    args:
+      - 'build'
+      - '--tag'
+      - 'us-central1-docker.pkg.dev/aibuild-495014/finagent/finagent:$COMMIT_SHA'
+      - '--tag'
+      - 'us-central1-docker.pkg.dev/aibuild-495014/finagent/finagent:latest'
+      - '--file'
+      - 'deploy/Dockerfile'
+      - '.'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push'
+    waitFor: ['build']
+    args:
+      - 'push'
+      - '--all-tags'
+      - 'us-central1-docker.pkg.dev/aibuild-495014/finagent/finagent'
+
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'deploy'
+    waitFor: ['push']
+    args:
+      - 'run'
+      - 'deploy'
+      - 'finagent'
+      - '--image'
+      - 'us-central1-docker.pkg.dev/aibuild-495014/finagent/finagent:$COMMIT_SHA'
+      - '--region'
+      - 'us-central1'
+      - '--project'
+      - 'aibuild-495014'
+      - '--service-account'
+      - 'finagent-sa@aibuild-495014.iam.gserviceaccount.com'
+      - '--port'
+      - '8080'
+      - '--memory'
+      - '4Gi'
+      - '--cpu'
+      - '2'
+      - '--min-instances'
+      - '0'
+      - '--max-instances'
+      - '10'
+      - '--concurrency'
+      - '4'
+      - '--timeout'
+      - '300'
+      - '--no-allow-unauthenticated'
+      - '--platform'
+      - 'managed'
+      - '--set-secrets'
+      - 'GOOGLE_API_KEY=GOOGLE_API_KEY:latest,GOOGLE_CLOUD_PROJECT=GOOGLE_CLOUD_PROJECT:latest,GOOGLE_CLOUD_LOCATION=GOOGLE_CLOUD_LOCATION:latest,GOOGLE_GENAI_USE_VERTEXAI=GOOGLE_GENAI_USE_VERTEXAI:latest,MODEL_ORCHESTRATOR=MODEL_ORCHESTRATOR:latest,MODEL_ANALYST=MODEL_ANALYST:latest,GCS_BUCKET_URI=GCS_BUCKET_URI:latest,VECTOR_INDEX_ID=VECTOR_INDEX_ID:latest,VECTOR_INDEX_ENDPOINT_ID=VECTOR_INDEX_ENDPOINT_ID:latest,DEPLOYED_INDEX_ID=DEPLOYED_INDEX_ID:latest,EMBEDDING_MODEL=EMBEDDING_MODEL:latest,GENERATION_MODEL=GENERATION_MODEL:latest,EMBEDDING_DIMENSIONS=EMBEDDING_DIMENSIONS:latest,TOP_K=TOP_K:latest,RRF_RANKING_ALPHA=RRF_RANKING_ALPHA:latest,EMBEDDING_BATCH_SIZE=EMBEDDING_BATCH_SIZE:latest,API_MAX_RETRIES=API_MAX_RETRIES:latest,RISK_FREE_RATE=RISK_FREE_RATE:latest,BENCHMARK_TICKER=BENCHMARK_TICKER:latest,DOCUMENTS_DIR=DOCUMENTS_DIR:latest,DATA_DIR=DATA_DIR:latest'
+
+images:
+  - 'us-central1-docker.pkg.dev/aibuild-495014/finagent/finagent:$COMMIT_SHA'
+  - 'us-central1-docker.pkg.dev/aibuild-495014/finagent/finagent:latest'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: 'E2_HIGHCPU_8'
